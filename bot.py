@@ -1,5 +1,3 @@
-#(©) Codeflix_Bots
-
 from aiohttp import web
 from plugins import web_server
 
@@ -7,7 +5,7 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 import sys
 from datetime import datetime
-from config import LOGGER, PORT, OWNER_ID, SHORT_URL, SHORT_API, SHORT_TUT
+from config import LOGGER, PORT, OWNER_ID, SHORT_URL, SHORT_API, SHORT_TUT, SESSION, WORKERS, DB_CHANNEL, FSUBS, TOKEN, ADMINS, MESSAGES, AUTO_DEL, DB_URI, DB_NAME, API_ID, API_HASH, PROTECT, DISABLE_BTN
 from helper import MongoDB
 
 version = "v1.0.0"
@@ -142,7 +140,7 @@ class Bot(Client):
         try:
             db_channel = await self.get_chat(self.db)
             self.db_channel = db_channel
-            test = await self.send_message(chat_id = db_channel.id, text = "Testing Message by @ProYato")
+            test = await self.send_message(chat_id = db_channel.id, text = "Testing Message by @Pro")
             await test.delete()
             
             # Log DB channels info
@@ -151,7 +149,7 @@ class Bot(Client):
         except Exception as e:
             self.LOGGER(__name__, self.name).warning(e)
             self.LOGGER(__name__, self.name).warning(f"Make Sure bot is Admin in DB Channel, and Double check the database channel Value, Current Value {self.db}")
-            self.LOGGER(__name__, self.name).info("\nBot Stopped. Join https://t.me/animes_cruise for support")
+            self.LOGGER(__name__, self.name).info("\nBot Stopped. Join https://t.me/allfreecoursesforfree for support")
             sys.exit()
         self.LOGGER(__name__, self.name).info("Bot Started!!")
         
@@ -174,4 +172,31 @@ async def web_app():
     await app.setup()
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
-    
+
+import asyncio
+from pyrogram import idle
+
+async def start_services():
+    bot = Bot(
+        SESSION,
+        WORKERS,
+        DB_CHANNEL,
+        FSUBS,
+        TOKEN,
+        ADMINS,
+        MESSAGES,
+        AUTO_DEL,
+        DB_URI,
+        DB_NAME,
+        API_ID,
+        API_HASH,
+        PROTECT,
+        DISABLE_BTN
+    )
+    await bot.start()
+    await web_app() 
+    await idle()
+    await bot.stop()
+
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(start_services())
